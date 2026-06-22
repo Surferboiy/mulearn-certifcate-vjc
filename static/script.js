@@ -248,22 +248,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.querySelectorAll('.align-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 elData.align = btn.dataset.align;
+                syncBoxVisuals(dragBox, elData);
             });
         });
 
         // Shadow checkbox
         card.querySelector('.shadow-check').addEventListener('change', (e) => {
             elData.shadow = e.target.checked;
+            syncBoxVisuals(dragBox, elData);
         });
 
         // Stroke width
         card.querySelector('.stroke-width-input').addEventListener('input', (e) => {
             elData.stroke_width = parseInt(e.target.value) || 0;
+            syncBoxVisuals(dragBox, elData);
         });
 
         // Stroke color
         card.querySelector('.stroke-color-input').addEventListener('input', (e) => {
             elData.stroke_color = e.target.value;
+            syncBoxVisuals(dragBox, elData);
         });
 
         // Hover effect to find box easily
@@ -277,7 +281,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const scaleX = imgRect.width / naturalWidth;
         const scaleY = imgRect.height / naturalHeight;
 
-        // Give the box more visual padding and make it taller so it's easier to interact with
         const widthPx = Math.max(60, elData.max_text_width * scaleX);
         const heightPx = Math.max(30, (elData.max_font_size * scaleY) * 1.4);
 
@@ -285,6 +288,26 @@ document.addEventListener('DOMContentLoaded', () => {
         dragBox.style.height = `${heightPx}px`;
         dragBox.style.fontSize = `${Math.max(14, heightPx * 0.7)}px`;
         dragBox.style.color = elData.text_color;
+
+        // --- Alignment ---
+        const align = elData.align || 'left';
+        dragBox.style.justifyContent = align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start';
+        dragBox.style.textAlign = align;
+
+        // --- Drop shadow ---
+        let shadow = elData.shadow ? '2px 2px 4px rgba(0,0,0,0.85)' : 'none';
+
+        // --- Stroke (text-stroke via CSS paint-order trick) ---
+        const sw = elData.stroke_width || 0;
+        const sc = elData.stroke_color || '#000000';
+        if (sw > 0) {
+            dragBox.style.webkitTextStroke = `${sw}px ${sc}`;
+            dragBox.style.paintOrder = 'stroke fill';
+        } else {
+            dragBox.style.webkitTextStroke = 'unset';
+        }
+
+        dragBox.style.textShadow = shadow;
     }
 
     // --- DRAG LOGIC ---
