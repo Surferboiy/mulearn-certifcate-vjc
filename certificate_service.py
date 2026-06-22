@@ -120,7 +120,7 @@ def generate_certificates_zip(template_bytes, data_bytes, data_filename, config)
     zip_buffer = io.BytesIO()
     seen_names = set()
     
-    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_STORED) as zip_file:
         for i, row in enumerate(data_rows):
             image = template_image.copy()
             draw_elements_on_image(image, elements, row)
@@ -162,7 +162,7 @@ def generate_certificates_zip(template_bytes, data_bytes, data_filename, config)
             filename = f"{safe_name}.png"
             
             img_byte_arr = io.BytesIO()
-            image.save(img_byte_arr, format='PNG', pnginfo=meta)
+            image.save(img_byte_arr, format='PNG', compress_level=1, pnginfo=meta)
             zip_file.writestr(filename, img_byte_arr.getvalue())
             
     zip_buffer.seek(0)
