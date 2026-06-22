@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate Generator for µLearn VJC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Lora&family=Montserrat&family=Open+Sans&family=Oswald&family=Outfit:wght@300;400;600;800&family=Pacifico&family=Playfair+Display&family=Raleway&family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <main class="container">
+        <header class="header">
+            <h1>Certificate Generator for µLearn VJC</h1>
+            <p>Design multi-element certificates dynamically.</p>
+        </header>
+
+        <form id="generator-form" class="glass-panel" method="POST" enctype="multipart/form-data">
+            
+            <!-- STEP 1 -->
+            <div id="step-1" class="step active">
+                <h2>1. Upload Assets</h2>
+                <div class="form-grid">
+                    <div class="column">
+                        <div class="input-group file-upload" id="drop-template">
+                            <label for="template">Template Image (PNG/JPG)</label>
+                            <input type="file" name="template" id="template" accept="image/png, image/jpeg" required>
+                            <div class="file-dummy">
+                                <span class="icon">🖼️</span>
+                                <span class="text" id="template-text">Click or Drop Template</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="input-group file-upload" id="drop-excel">
+                            <label for="excel">Names List (Excel, CSV, TXT)</label>
+                            <input type="file" name="excel" id="excel" accept=".xlsx,.xls,.csv,.txt" required>
+                            <div class="file-dummy">
+                                <span class="icon">📊</span>
+                                <span class="text" id="excel-text">Click or Drop Data File</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button type="button" class="btn-primary" id="btn-next">
+                        <span class="btn-text">Parse Data & Continue</span>
+                        <div class="loader" id="loader-step1"></div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 2 -->
+            <div id="step-2" class="step">
+                <h2>2. Build Template</h2>
+                <div class="preview-layout">
+                    <!-- Canvas -->
+                    <div class="canvas-container" id="canvas-container">
+                        <img id="preview-image" src="" alt="Template">
+                        <!-- Draggable boxes go here -->
+                    </div>
+
+                    <!-- Elements Sidebar -->
+                    <div class="controls-sidebar">
+                        <div class="elements-list" id="elements-list">
+                            <!-- Element configs go here -->
+                        </div>
+
+                        <button type="button" class="btn-secondary" id="btn-add-element" style="width: 100%; margin-bottom: 20px;">+ Add Text Element</button>
+
+                        <input type="hidden" name="config" id="config_payload">
+                        <input type="hidden" name="preview_row" id="preview_row_payload">
+
+                        <div class="actions">
+                            <button type="button" class="btn-secondary" id="btn-preview" style="width: 100%;">👀 Live Preview</button>
+                            <button type="button" class="btn-secondary" id="btn-back" style="width: 100%;">Back</button>
+                            <button type="submit" class="btn-primary" id="submit-btn" style="width: 100%; margin-top: 10px;">
+                                <span class="btn-text">Generate Certificates</span>
+                                <div class="loader"></div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="error-message" class="error-msg" style="margin-top: 20px;"></div>
+        </form>
+    </main>
+
+    <footer style="text-align: center; color: var(--text-muted); margin-top: 20px; padding-bottom: 30px; font-size: 0.95rem;">
+        <p>If any doubts, message in core 😉</p>
+    </footer>
+
+    <!-- Modal -->
+    <div id="preview-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Live Preview</h2>
+            <p style="margin-bottom: 15px; color: var(--text-muted);">Previewing your design with real data from row 1.</p>
+            <div class="modal-body">
+                <div class="loader" id="modal-loader" style="display: block; margin: 0 auto; position: static;"></div>
+                <img id="modal-image" src="" style="display: none; max-width: 100%; border-radius: 12px; border: 1px solid var(--glass-border);">
+            </div>
+        </div>
+    </div>
+
+    <!-- Element Template (Hidden) -->
+    <template id="element-template">
+        <div class="element-card" data-id="">
+            <div class="element-header">
+                <span class="element-title">Element</span>
+                <button type="button" class="btn-delete">×</button>
+            </div>
+            <div class="element-body">
+                <div class="input-group">
+                    <label>Data Column</label>
+                    <select class="column-select"></select>
+                </div>
+                <div class="row">
+                    <div class="input-group">
+                        <label>Font</label>
+                        <select class="font-select">
+                            <option value="Roboto">Roboto</option>
+                            <option value="OpenSans">Open Sans</option>
+                            <option value="Montserrat">Montserrat</option>
+                            <option value="Oswald">Oswald</option>
+                            <option value="Raleway">Raleway</option>
+                            <option value="PlayfairDisplay">Playfair Display</option>
+                            <option value="Lora">Lora</option>
+                            <option value="DancingScript">Dancing Script</option>
+                            <option value="Pacifico">Pacifico</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Color</label>
+                        <input type="color" class="color-input" value="#ffffff">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-group">
+                        <label>Max Size</label>
+                        <input type="number" class="max-font-input" value="43">
+                    </div>
+                    <div class="input-group">
+                        <label>Max Width</label>
+                        <input type="number" class="max-width-input" value="900">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
