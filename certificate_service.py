@@ -39,7 +39,7 @@ def extract_data_rows(data_bytes, filename):
                     data_rows.append(row_dict)
                 
     elif ext in ['.xlsx', '.xls']:
-        wb = load_workbook(io.BytesIO(data_bytes), data_only=True)
+        wb = load_workbook(io.BytesIO(data_bytes), data_only=True, read_only=True)
         sheet = wb.active
         rows = list(sheet.iter_rows(values_only=True))
         if rows:
@@ -49,6 +49,7 @@ def extract_data_rows(data_bytes, filename):
                 row_dict = {headers[i]: (str(padded_row[i]).strip() if padded_row[i] is not None else "") for i in range(len(headers))}
                 if any(v for v in row_dict.values()):
                     data_rows.append(row_dict)
+        wb.close()
                     
     return headers, data_rows
 
