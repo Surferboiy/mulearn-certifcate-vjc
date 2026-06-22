@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Certificate Generator for µLearn VJC</title>
+    <meta name="description" content="Design and generate multi-element certificates dynamically for µLearn VJCET.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Lora&family=Montserrat&family=Open+Sans&family=Oswald&family=Outfit:wght@300;400;600;800&family=Pacifico&family=Playfair+Display&family=Raleway&family=Roboto&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
 </head>
@@ -35,6 +37,7 @@
                                 <span class="text" id="template-text">Click or Drop Template</span>
                             </div>
                         </div>
+                        <p id="template-size-warning" class="size-warning" style="display:none;">⚠️ Large image detected (&gt;5MB). It will be auto-resized on the server for faster generation.</p>
                     </div>
                     <div class="column">
                         <div class="input-group file-upload" id="drop-excel">
@@ -109,6 +112,15 @@
         </div>
     </div>
 
+    <!-- Success Toast -->
+    <div id="success-toast" class="toast">
+        <span class="toast-icon">🎉</span>
+        <div class="toast-body">
+            <strong id="toast-title">Certificates Ready!</strong>
+            <span id="toast-msg"></span>
+        </div>
+    </div>
+
     <!-- Element Template (Hidden) -->
     <template id="element-template">
         <div class="element-card" data-id="">
@@ -149,6 +161,32 @@
                     <div class="input-group">
                         <label>Max Width</label>
                         <input type="number" class="max-width-input" value="900">
+                    </div>
+                </div>
+                <!-- Alignment -->
+                <div class="input-group">
+                    <label>Alignment</label>
+                    <div class="align-group">
+                        <button type="button" class="align-btn active" data-align="left" title="Left">&#9664; Left</button>
+                        <button type="button" class="align-btn" data-align="center" title="Center">&#9670; Center</button>
+                        <button type="button" class="align-btn" data-align="right" title="Right">Right &#9654;</button>
+                    </div>
+                </div>
+                <!-- Effects -->
+                <div class="row">
+                    <div class="input-group">
+                        <label>
+                            <input type="checkbox" class="shadow-check" style="width:auto;margin-right:5px;">
+                            Drop Shadow
+                        </label>
+                    </div>
+                    <div class="input-group">
+                        <label>Stroke Width</label>
+                        <input type="number" class="stroke-width-input" value="0" min="0" max="5">
+                    </div>
+                    <div class="input-group">
+                        <label>Stroke Color</label>
+                        <input type="color" class="stroke-color-input" value="#000000">
                     </div>
                 </div>
             </div>
