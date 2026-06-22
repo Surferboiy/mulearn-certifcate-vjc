@@ -180,8 +180,9 @@ def generate_certificates_zip_to_file(template_bytes, data_bytes, data_filename,
             seen_names.add(safe_name)
 
             img_buf = io.BytesIO()
-            image.save(img_buf, format='PNG', compress_level=1)
-            zip_file.writestr(f"{safe_name}.png", img_buf.getvalue())
+            # JPEG is ~8x smaller than PNG for certificates with virtually no visual difference
+            image.save(img_buf, format='JPEG', quality=85, optimize=True, subsampling=0)
+            zip_file.writestr(f"{safe_name}.jpg", img_buf.getvalue())
 
     temp_zip.close()
     return temp_zip.name
@@ -200,5 +201,5 @@ def generate_single_preview(template_bytes, config, preview_row):
     draw_elements_on_image(image, elements, preview_row)
 
     img_byte_arr = io.BytesIO()
-    image.save(img_byte_arr, format='PNG')
+    image.save(img_byte_arr, format='JPEG', quality=85, optimize=True, subsampling=0)
     return img_byte_arr.getvalue()
