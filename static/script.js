@@ -38,6 +38,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let startMouseX, startMouseY;
     let startBoxX, startBoxY;
 
+    // --- File size warning ---
+    templateInput.addEventListener('change', () => {
+        const warning = document.getElementById('template-size-warning');
+        if (templateInput.files.length && templateInput.files[0].size > 5 * 1024 * 1024) {
+            warning.style.display = 'block';
+        } else {
+            warning.style.display = 'none';
+        }
+    });
+
     // --- STEP 1 -> STEP 2 (Parse Headers) ---
     btnNext.addEventListener('click', async () => {
         if (!templateInput.files.length || !excelInput.files.length) {
@@ -137,7 +147,11 @@ document.addEventListener('DOMContentLoaded', () => {
             max_font_size: 43,
             min_font_size: 30,
             max_text_width: 900,
-            text_x: 100, // Initial defaults
+            align: "left",
+            shadow: false,
+            stroke_width: 0,
+            stroke_color: "#000000",
+            text_x: 100,
             text_y: 390
         };
         elements.push(elData);
@@ -226,6 +240,30 @@ document.addEventListener('DOMContentLoaded', () => {
             elements = elements.filter(e => e.id !== elData.id);
             card.remove();
             dragBox.remove();
+        });
+
+        // Alignment buttons
+        card.querySelectorAll('.align-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                card.querySelectorAll('.align-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                elData.align = btn.dataset.align;
+            });
+        });
+
+        // Shadow checkbox
+        card.querySelector('.shadow-check').addEventListener('change', (e) => {
+            elData.shadow = e.target.checked;
+        });
+
+        // Stroke width
+        card.querySelector('.stroke-width-input').addEventListener('input', (e) => {
+            elData.stroke_width = parseInt(e.target.value) || 0;
+        });
+
+        // Stroke color
+        card.querySelector('.stroke-color-input').addEventListener('input', (e) => {
+            elData.stroke_color = e.target.value;
         });
 
         // Hover effect to find box easily
@@ -379,6 +417,22 @@ document.addEventListener('DOMContentLoaded', () => {
         hideError();
         preparePayload();
 
+        // Show animated progress bar
+        let progressWrap = document.getElementById('progress-bar-wrap');
+        if (!progressWrap) {
+            progressWrap = document.createElement('div');
+            progressWrap.className = 'progress-bar-wrap';
+            progressWrap.id = 'progress-bar-wrap';
+            progressWrap.innerHTML = '<div class="progress-bar-fill"></div>';
+            submitBtn.parentNode.insertBefore(progressWrap, submitBtn.nextSibling);
+        }
+        progressWrap.style.display = 'block';
+        // Reset animation
+        const fill = progressWrap.querySelector('.progress-bar-fill');
+        fill.style.animation = 'none';
+        fill.offsetHeight; // reflow
+        fill.style.animation = 'progressGrow 30s linear forwards';
+
         try {
             const formData = new FormData(form);
             const response = await fetch(`${BACKEND_URL}/generate`, { method: 'POST', body: formData });
@@ -395,6 +449,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
+            // Read summary headers before consuming the blob
+            const totalCerts = response.headers.get('X-Total-Certs') || '?';
+            const zipSizeBytes = parseInt(response.headers.get('X-Zip-Size') || '0');
+            const zipSizeMB = zipSizeBytes > 0 ? (zipSizeBytes / (1024 * 1024)).toFixed(1) : null;
+
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -404,11 +463,20 @@ document.addEventListener('DOMContentLoaded', () => {
             a.click();
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
+
+            // Show success toast
+            const toast = document.getElementById('success-toast');
+            document.getElementById('toast-title').textContent = `🎉 ${totalCerts} Certificates Ready!`;
+            document.getElementById('toast-msg').textContent = zipSizeMB ? `ZIP size: ${zipSizeMB} MB` : 'Download started!';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 5000);
+
         } catch (err) {
             showError(err.message);
         } finally {
             submitBtn.classList.remove('loading');
             submitBtn.disabled = false;
+            progressWrap.style.display = 'none';
         }
     });
 
