@@ -64,6 +64,30 @@ def generate():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/generate-single', methods=['POST'])
+def generate_single():
+    if 'template' not in request.files:
+        return jsonify({"error": "Missing template file"}), 400
+    try:
+        template_bytes = request.files['template'].read()
+        config = json.loads(request.form.get('config', '{}'))
+        manual_row = json.loads(request.form.get('manual_row', '{}'))
+
+        img_bytes = generate_single_preview(template_bytes, config, manual_row)
+
+        elements = config.get('elements', [])
+        fname = "certificate"
+        if elements and manual_row:
+            col = elements[0].get('column', '')
+            val = manual_row.get(col, '').strip()
+            if val:
+                fname = "".join(c for c in val.upper() if c.isalnum() or c in " _-").strip() or "certificate"
+
+        return send_file(io.BytesIO(img_bytes), mimetype='image/jpeg',
+                         as_attachment=True, download_name=f"{fname}.jpg")
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/preview', methods=['POST'])
 def preview():
     if 'template' not in request.files:
