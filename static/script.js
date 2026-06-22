@@ -384,8 +384,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`${BACKEND_URL}/generate`, { method: 'POST', body: formData });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Generation failed.');
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Generation failed.');
+                } else {
+                    const errorText = await response.text();
+                    console.error("Server returned non-JSON error:", errorText);
+                    throw new Error('Server crashed or returned an invalid response (Check server logs).');
+                }
             }
 
             const blob = await response.blob();
@@ -423,8 +430,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`${BACKEND_URL}/preview`, { method: 'POST', body: formData });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Preview failed.');
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Preview failed.');
+                } else {
+                    const errorText = await response.text();
+                    console.error("Server returned non-JSON error:", errorText);
+                    throw new Error('Server crashed or returned an invalid response (Check server logs).');
+                }
             }
 
             const blob = await response.blob();
