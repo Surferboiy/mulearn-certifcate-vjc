@@ -1,9 +1,11 @@
 from flask import Flask, render_template, request, send_file, jsonify
+from flask_cors import CORS
 from certificate_service import generate_certificates_zip, extract_data_rows, generate_single_preview
 import io
 import json
 
 app = Flask(__name__)
+CORS(app) # Enable CORS for all domains so Vercel frontend can communicate with Render backend
 
 @app.route('/')
 def index():
