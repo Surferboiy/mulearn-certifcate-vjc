@@ -61,6 +61,25 @@
             <!-- STEP 2 -->
             <div id="step-2" class="step">
                 <h2>2. Build Template</h2>
+
+                <!-- Mode Toggle -->
+                <div class="mode-toggle" id="mode-toggle">
+                    <button type="button" class="mode-btn active" id="mode-batch">📋 Batch (from file)</button>
+                    <button type="button" class="mode-btn" id="mode-single">👤 Single Certificate</button>
+                </div>
+
+                <!-- Single Cert Inputs (hidden by default) -->
+                <div id="single-cert-panel" style="display:none; margin-bottom: 20px;">
+                    <div class="glass-panel" style="padding:20px; background: rgba(99,102,241,0.05); border-color: rgba(99,102,241,0.3);">
+                        <p style="color: var(--text-muted); font-size:0.85rem; margin-bottom:14px;">Fill in values for each text element to generate a single certificate.</p>
+                        <div id="single-inputs"></div>
+                        <button type="button" class="btn-primary" id="btn-single-generate" style="width:100%; margin-top:8px;">
+                            <span class="btn-text">⬇️ Download Certificate</span>
+                            <div class="loader"></div>
+                        </button>
+                    </div>
+                </div>
+
                 <div class="preview-layout">
                     <!-- Canvas -->
                     <div class="canvas-container" id="canvas-container">
@@ -82,10 +101,12 @@
                         <div class="actions">
                             <button type="button" class="btn-secondary" id="btn-preview" style="width: 100%;">👀 Live Preview</button>
                             <button type="button" class="btn-secondary" id="btn-back" style="width: 100%;">Back</button>
-                            <button type="submit" class="btn-primary" id="submit-btn" style="width: 100%; margin-top: 10px;">
-                                <span class="btn-text">Generate Certificates</span>
-                                <div class="loader"></div>
-                            </button>
+                            <div id="batch-generate-wrap" style="width:100%;">
+                                <button type="submit" class="btn-primary" id="submit-btn" style="width: 100%; margin-top: 10px;">
+                                    <span class="btn-text">Generate Certificates</span>
+                                    <div class="loader"></div>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -97,6 +118,7 @@
 
     <footer style="text-align: center; color: var(--text-muted); margin-top: 20px; padding-bottom: 30px; font-size: 0.95rem;">
         <p>If any doubts, message in core 😉</p>
+        <p>Core 2026</p>
     </footer>
 
     <!-- Modal -->
@@ -162,6 +184,16 @@
                         <label>Max Width</label>
                         <input type="number" class="max-width-input" value="900">
                     </div>
+                </div>
+                <!-- Text Case -->
+                <div class="input-group">
+                    <label>Text Case</label>
+                    <select class="text-case-select">
+                        <option value="upper">ALL CAPS (ABC)</option>
+                        <option value="title">Title Case (Abc)</option>
+                        <option value="lower">lowercase (abc)</option>
+                        <option value="none">As-Is (no change)</option>
+                    </select>
                 </div>
                 <!-- Alignment -->
                 <div class="input-group">
