@@ -197,6 +197,12 @@ input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
 input[type="color"]::-webkit-color-swatch { border: 2px solid white; border-radius: 50%; }
 .color-val { font-family: monospace; color: var(--text-muted); }
 
+/* Mode Toggle */
+.mode-toggle { display: flex; gap: 10px; margin-bottom: 20px; background: rgba(0,0,0,0.2); border-radius: 14px; padding: 6px; border: 1px solid var(--glass-border); }
+.mode-btn { flex: 1; padding: 10px; font-size: 0.9rem; font-weight: 600; font-family: var(--font-family); background: transparent; border: none; border-radius: 10px; color: var(--text-muted); cursor: pointer; transition: all 0.25s ease; }
+.mode-btn.active { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; box-shadow: 0 4px 12px rgba(99,102,241,0.4); }
+.mode-btn:hover:not(.active) { color: white; background: rgba(255,255,255,0.08); }
+
 /* Toggle Switch */
 .checkbox-group { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
 .toggle-switch { position: relative; display: inline-block; width: 48px; height: 26px; }
