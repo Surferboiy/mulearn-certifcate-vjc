@@ -42,7 +42,7 @@ def generate():
         config_str = request.form.get('config', '{}')
         config = json.loads(config_str)
         
-        zip_path = generate_certificates_zip_to_file(template_bytes, data_bytes, data_file.filename, config)
+        zip_path, total, zip_size = generate_certificates_zip_to_file(template_bytes, data_bytes, data_file.filename, config)
         
         @after_this_request
         def remove_file(response):
@@ -50,6 +50,9 @@ def generate():
                 os.remove(zip_path)
             except Exception:
                 pass
+            response.headers['X-Total-Certs'] = str(total)
+            response.headers['X-Zip-Size'] = str(zip_size)
+            response.headers['Access-Control-Expose-Headers'] = 'X-Total-Certs, X-Zip-Size'
             return response
             
         return send_file(
