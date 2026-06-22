@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, send_file, jsonify
+from flask import Flask, render_template, request, send_file, jsonify, after_this_request
 from flask_cors import CORS
-from certificate_service import generate_certificates_zip, extract_data_rows, generate_single_preview
+from certificate_service import generate_certificates_zip_to_file, extract_data_rows, generate_single_preview
 import io
 import json
+import os
 
 app = Flask(__name__)
 CORS(app) # Enable CORS for all domains so Vercel frontend can communicate with Render backend
@@ -41,15 +42,22 @@ def generate():
         config_str = request.form.get('config', '{}')
         config = json.loads(config_str)
         
-        zip_bytes = generate_certificates_zip(template_bytes, data_bytes, data_file.filename, config)
+        zip_path = generate_certificates_zip_to_file(template_bytes, data_bytes, data_file.filename, config)
         
+        @after_this_request
+        def remove_file(response):
+            try:
+                os.remove(zip_path)
+            except Exception:
+                pass
+            return response
+            
         return send_file(
-            io.BytesIO(zip_bytes),
+            zip_path,
             mimetype='application/zip',
             as_attachment=True,
             download_name='certificates.zip'
         )
-        
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
