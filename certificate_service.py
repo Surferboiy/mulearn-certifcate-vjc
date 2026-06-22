@@ -107,7 +107,17 @@ def draw_elements_on_image(image, prebuilt_elements, row_data):
         text = row_data.get(el['column'], '') or el.get('literal', '')
         if not text:
             continue
-        text = str(text).upper()
+        text = str(text)
+
+        # Apply text case transform
+        transform = el.get('text_transform', 'upper')
+        if transform == 'upper':
+            text = text.upper()
+        elif transform == 'title':
+            text = text.title()
+        elif transform == 'lower':
+            text = text.lower()
+        # else 'none' — leave as-is
 
         font = _fit_font_size(draw, text, el['font_path'],
                               el['max_font_size'], el['min_font_size'], el['max_text_width'])
@@ -145,19 +155,20 @@ def _prebuilt(elements):
     for el in elements:
         font_name = el.get('font', 'Roboto')
         result.append({
-            'column':        el.get('column', ''),
-            'literal':       el.get('text', ''),
-            'font_path':     _get_font_path(font_name),
-            'text_rgb':      hex_to_rgb(el.get('text_color', '#ffffff')),
-            'stroke_rgb':    hex_to_rgb(el.get('stroke_color', '#000000')),
-            'text_x':        int(el.get('text_x', 100)),
-            'text_y':        int(el.get('text_y', 390)),
-            'max_font_size': int(el.get('max_font_size', 43)),
-            'min_font_size': int(el.get('min_font_size', 30)),
-            'max_text_width':int(el.get('max_text_width', 900)),
-            'align':         el.get('align', 'left'),
-            'shadow':        bool(el.get('shadow', False)),
-            'stroke_width':  int(el.get('stroke_width', 0)),
+            'column':         el.get('column', ''),
+            'literal':        el.get('text', ''),
+            'font_path':      _get_font_path(font_name),
+            'text_rgb':       hex_to_rgb(el.get('text_color', '#ffffff')),
+            'stroke_rgb':     hex_to_rgb(el.get('stroke_color', '#000000')),
+            'text_x':         int(el.get('text_x', 100)),
+            'text_y':         int(el.get('text_y', 390)),
+            'max_font_size':  int(el.get('max_font_size', 43)),
+            'min_font_size':  int(el.get('min_font_size', 30)),
+            'max_text_width': int(el.get('max_text_width', 900)),
+            'align':          el.get('align', 'left'),
+            'shadow':         bool(el.get('shadow', False)),
+            'stroke_width':   int(el.get('stroke_width', 0)),
+            'text_transform': el.get('text_transform', 'upper'),
         })
     return result
 
